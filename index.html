@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <title>Markov Model Hairball Diagram</title>
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <link href='http://fonts.googleapis.com/css?family=Exo+2'
+              rel='stylesheet' type='text/css'>
+        <style>
+            div#header h1 {
+                text-align: center;
+                font-family: 'Exo 2', sans-serif;
+                margin-top: 3%;
+            }
+
+            div#figure {
+                position: absolute;
+                top: 2%;
+                bottom: 0;
+                left: 0;
+                right: 0;
+
+                width: 600px;
+                height: 600px;
+                margin: auto;
+            }
+
+            div#figure svg {
+                border: 1px solid steelblue;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="header">
+            <h1>Hairball Diagram</h1>
+        </div>
+        <div id="figure">
+            <svg width="600" height="600">
+                <circle id="c1" r="5" fill="steelblue" />
+                <circle id="c2" r="5" fill="red" />
+                <circle id="c3" r="5" fill="slategrey" />
+            </svg>
+        </div>
+        <script src="viz.js" charset="utf-8"></script>
+    </body>
+</html>
