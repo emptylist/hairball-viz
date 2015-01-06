@@ -23,7 +23,7 @@ var Vector = {
 var Origin = Vector.create(300, 300);
 var stiffness = 1;
 var coeffElec = 500;
-var coeffFriction = 0.5;
+var coeffFriction = 0.8;
 var VertexTable = [];
 
 var Vertex = {
@@ -56,12 +56,12 @@ var Vertex = {
     this.elec.setVec(0,0);
     var i=0;
     for (i=0; i < VertexTable.length; i++) {
-      var rSq = Math.pow(this.x() - VertexTable[i].x(), 4) +
-              Math.pow(this.y() - VertexTable[i].y(), 4);
-      if (rSq != 0) {
-        this.elec.x += -1 * coeffElec * (this.x() - VertexTable[i].x()) / rSq;
+      var r = Math.sqrt(Math.pow(this.x() - VertexTable[i].x(), 2) +
+                        Math.pow(this.y() - VertexTable[i].y(), 2));
+      if (r != 0) {
+        this.elec.x += -1 * coeffElec * (this.x() - VertexTable[i].x()) / r;
         console.log(i + " " + this.elec.x);
-        this.elec.y += -1 * coeffElec * (this.y() - VertexTable[i].y()) / rSq;
+        this.elec.y += -1 * coeffElec * (this.y() - VertexTable[i].y()) / r;
       }
     }
     this.elec.multConst(this.dt);
