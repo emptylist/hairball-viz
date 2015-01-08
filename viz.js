@@ -1,8 +1,9 @@
+var file = null;
 var stiffness = 8;
 var bondDist = 100;
 var coeffElec = 20;
 var coeffFriction = 0.2;
-var timestep = 0.05;
+var timestep = 0.02;
 var globalRadius = 20;
 var VertexTable = [];
 var figure = d3.select("div#figure svg");
@@ -182,31 +183,6 @@ var Bond = {
   }
 };
 
-var v1 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
-var v2 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
-var v3 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
-var v4 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
-
-VertexTable.push(v1);
-VertexTable.push(v2);
-VertexTable.push(v3);
-VertexTable.push(v4);
-
-var b1 = Bond.create(v1, v2, Math.random(), figure);
-var b2 = Bond.create(v2, v3, Math.random(), figure);
-var b3 = Bond.create(v1, v3, Math.random(), figure);
-var b4 = Bond.create(v3, v1, Math.random(), figure);
-var b5 = Bond.create(v1, v4, Math.random(), figure);
-var b6 = Bond.create(v4, v1, Math.random(), figure);
-
-BondTable = [];
-BondTable.push(b1);
-BondTable.push(b2);
-BondTable.push(b3);
-BondTable.push(b4);
-BondTable.push(b5);
-BondTable.push(b6);
-
 function update() {
   var i;
   for (i=0; i<VertexTable.length; i++) {
@@ -216,6 +192,35 @@ function update() {
     BondTable[i].update();
   }
 };
-update();
-setInterval(update, 50);
+
+if (file === null) {
+  var v1 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
+  var v2 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
+  var v3 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
+  var v4 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
+  var v5 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
+
+  VertexTable.push(v1);
+  VertexTable.push(v2);
+  VertexTable.push(v3);
+  VertexTable.push(v4);
+  VertexTable.push(v5);
+
+  var b1 = Bond.create(v1, v2, Math.random(), figure);
+  var b2 = Bond.create(v2, v3, Math.random(), figure);
+  var b3 = Bond.create(v1, v3, Math.random(), figure);
+  var b4 = Bond.create(v3, v1, Math.random(), figure);
+  var b5 = Bond.create(v1, v4, Math.random(), figure);
+  var b6 = Bond.create(v4, v1, Math.random(), figure);
+
+  BondTable = [];
+  BondTable.push(b1);
+  BondTable.push(b2);
+  BondTable.push(b3);
+  BondTable.push(b4);
+  BondTable.push(b5);
+  BondTable.push(b6);
+}
+
+setInterval(update, 20);
 
