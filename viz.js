@@ -1,4 +1,3 @@
-var file = null;
 var stiffness = 8;
 var bondDist = 100;
 var coeffElec = 20;
@@ -8,6 +7,7 @@ var globalRadius = 20;
 var VertexTable = [];
 var figure = d3.select("div#figure svg");
 var bondColor = d3.interpolateLab('#ff0000', '#0000ff');
+var ticker;
 
 var Vector = {
   create: function(x, y) {
@@ -59,6 +59,11 @@ var Vertex = {
     }
 
     return self;
+  },
+  clear: function() {
+    if(this.viz) {
+      this.viz.remove();
+    }
   },
   addBond: function(bond) {
     this.bonds.push(bond);
@@ -176,12 +181,18 @@ var Bond = {
 
     return self;
   },
+  clear: function() {
+    if (this.viz) {
+        this.viz.remove();
+    }
+  },
   update: function() {
     if (this.viz != null) {
       this.viz.attr("d", buildCurve(this.v1, this.v2));
     }
   }
 };
+var counter = 0;
 
 function update() {
   var i;
@@ -193,7 +204,66 @@ function update() {
   }
 };
 
-if (file === null) {
+function clearFigure() {
+  var i;
+  for (i=0; i<VertexTable.length; i++) {
+    VertexTable[i].clear();
+  }
+  for (i=0; i<BondTable.length; i++) {
+    BondTable[i].clear();
+  }
+  VertexTable = [];
+  BondTable = [];
+};
+
+function handleFiles(files) {
+  // We only care about one file
+  var file = files[0];
+  var reader = new FileReader();
+  var splitResults;
+  clearFigure();
+  clearInterval(ticker);
+
+  reader.onloadend = function() {
+    if (!reader.error) {
+      splitResults = reader.result.split("\n");
+      var v;
+      var i;
+      var line;
+      for (i=3; i<splitResults.length; i++) {
+        line = splitResults[i].split(" ");
+        if (line.length === 3) {
+          var from = line[0];
+          var to = line[1];
+          var prob = parseFloat(line[2]);
+          if (from === to) {
+            v = Vertex.create(Vector.create(Math.random() * 600, Math.random() * 600), prob, figure);
+            VertexTable.push(v);
+          }
+        }
+      }
+      for (i=3; i<splitResults.length; i++) {
+        line = splitResults[i].split(" ");
+        if (line.length === 3) {
+          var from = parseInt(line[0]);
+          var to = parseInt(line[1]);
+          var prob = parseFloat(line[2]);
+          if (from !== to) {
+            try {
+              Bond.create(VertexTable[from-1], VertexTable[to-1], Math.log(1/prob), figure);
+            } catch (e) {console.log(e); }
+          }
+        }
+      }
+    } else {
+      alert("An error occured while loading the file.");
+    }
+  };
+  reader.readAsText(file);
+};
+
+function loadDemo() {
+
   var v1 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
   var v2 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
   var v3 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
@@ -220,7 +290,15 @@ if (file === null) {
   BondTable.push(b4);
   BondTable.push(b5);
   BondTable.push(b6);
-}
 
-setInterval(update, 20);
+  figure.select("#demo").append("text")
+      .attr("x", 300)
+      .attr("y", 30)
+      .attr("text-anchor", "middle")
+      .attr("font-family", "\'Exo 2\', sans-serif")
+      .text("Demo");
+};
 
+loadDemo();
+
+ticker = setInterval(update, 20);

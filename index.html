@@ -21,10 +21,21 @@
                 width: 600px;
                 height: 600px;
                 margin: auto;
+                margin-top: 100px;
             }
 
             div#figure svg {
                 border: 1px solid steelblue;
+            }
+
+            #input {
+                position: absolute;
+                top: 720;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: auto;
+                margin-left: 40%;
             }
         </style>
     </head>
@@ -53,6 +64,8 @@
                         <feMergeNode in="SourceGraphic"/>
                     </feMerge>
                 </filter>
+                <g id="demo">
+                </g>
                 <g id="bonds"
                    style="filter:url(#dropshadow)">
                 </g>
@@ -60,6 +73,7 @@
                 </g>
             </svg>
         </div>
+        <input type="file" id="input" onchange="handleFiles(this.files)">
         <script src="viz.js" charset="utf-8"></script>
     </body>
 </html>
