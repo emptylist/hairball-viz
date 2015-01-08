@@ -34,9 +34,29 @@
         </div>
         <div id="figure">
             <svg width="600" height="600">
-                <g id="bonds">
+                <defs>
+                    <marker id="markerArrow"
+                            markerWidth="8"
+                            markerHeight="8"
+                            refx="6"
+                            refy="6"
+                            orient="auto"
+                            >
+                        <path d="M2,2 L2,11 L10,6 L2,2" style="fill:555555;"/>
+                    </marker>
+                </defs>
+                <filter id="dropshadow" height="130%">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+                    <feOffset dx=".5" dy=".5" result="offsetblur"/>
+                    <feMerge>
+                        <feMergeNode/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+                <g id="bonds"
+                   style="filter:url(#dropshadow)">
                 </g>
-                <g id="vertices">
+                <g id="vertices" style="filter:url(#dropshadow)">
                 </g>
             </svg>
         </div>

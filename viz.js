@@ -1,6 +1,6 @@
-var stiffness = 5;
+var stiffness = 8;
 var bondDist = 100;
-var coeffElec = 10;
+var coeffElec = 20;
 var coeffFriction = 0.2;
 var timestep = 0.05;
 var globalRadius = 20;
@@ -32,46 +32,12 @@ var Vector = {
 
 var Origin = Vector.create(300, 300);
 
-var Bond = {
-  create: function(v1, v2, k, svg) {
-    var self = Object.create(this);
-    self.v1 = v1;
-    self.v2 = v2;
-    self.k = k;
-
-    v1.addBond(self);
-    v2.addBond(self);
-
-    if (svg != null) {
-      self.viz = svg.select("g#bonds")
-                    .append("line")
-                    .attr("x1", v1.x())
-                    .attr("y1", v1.y())
-                    .attr("x2", v2.x())
-                    .attr("y2", v2.y())
-                    .style("stroke", bondColor(k))
-                    .style("stroke-width", 1.5);
-    } else {
-      self.viz = null;
-    }
-
-    return self;
-  },
-  update: function() {
-    if (this.viz != null) {
-      this.viz.attr("x1", this.v1.x())
-              .attr("y1", this.v1.y())
-              .attr("x2", this.v2.x())
-              .attr("y2", this.v2.y());
-    }
-  }
-}
-
 var Vertex = {
   create: function(posVec, metastability, svg) {
     var self = Object.create(this);
     self.pos = posVec;
     self.metastability = metastability;
+    self.radius = metastability * globalRadius;
     self.dt = timestep;
     self.bonds = [];
     self.velocity = Vector.create(0,0);
@@ -87,7 +53,7 @@ var Vertex = {
                     .append("circle")
                     .attr("cx", self.x())
                     .attr("cy", self.y())
-                    .attr("r", self.metastability * globalRadius)
+                    .attr("r", self.radius)
                     .style("fill", "steelblue");
     }
 
@@ -114,10 +80,10 @@ var Vertex = {
     for (i=0; i < VertexTable.length; i++) {
       var r = Math.sqrt(Math.pow(this.x() - VertexTable[i].x(), 2) +
                         Math.pow(this.y() - VertexTable[i].y(), 2));
-      r *= 0.5;
+      r *= 0.1;
       if (r != 0) {
-        this.elec.x += -1 * coeffElec * (this.x() - VertexTable[i].x()) / Math.pow(r,2);
-        this.elec.y += -1 * coeffElec * (this.y() - VertexTable[i].y()) / Math.pow(r,2);
+        this.elec.x += coeffElec * (this.x() - VertexTable[i].x()) / r;
+        this.elec.y += coeffElec * (this.y() - VertexTable[i].y()) / r;
       }
     }
     this.elec.multConst(this.dt);
@@ -168,21 +134,78 @@ var Vertex = {
   }
 };
 
-var v1 = Vertex.create(Vector.create(200, 200), 0.2, figure);
-var v2 = Vertex.create(Vector.create(300, 300), 0.5, figure);
-var v3 = Vertex.create(Vector.create(420, 320), 0.7, figure);
+function buildCurve(v1, v2) {
+  var xsgn = v1.x() - v2.x() > 0 ? 1 : -1;
+  var ysgn = v1.y() - v2.y() > 0 ? 1 : -1;
+  var v1r = {x: v1.x(),
+             y: v1.y() + (ysgn * v1.radius)};
+  var v2r = {x: v2.x() + (xsgn * v2.radius),
+             y: v2.y()};
+
+  var curveString = "M" + v1r.x +" " +
+                    v1r.y + " Q " +
+                    v1.x() + " " +
+                    v2.y() + " " +
+                    v2r.x + " " +
+                    v2r.y;
+  return curveString;
+};
+
+var Bond = {
+  create: function(v1, v2, k, svg) {
+    var self = Object.create(this);
+    self.v1 = v1;
+    self.v2 = v2;
+    self.k = k;
+
+    v1.addBond(self);
+    v2.addBond(self);
+
+    if (svg != null) {
+      self.viz = svg.select("g#bonds")
+                    .append("path")
+                    .attr("d", buildCurve(self.v1, self.v2))
+                    .style("stroke", bondColor(k))
+                    .style("stroke-width", 1.5 * k)
+                    .style("fill", "transparent")
+                    .style("marker-end", "url(#markerArrow)");
+    } else {
+      self.viz = null;
+    }
+
+    return self;
+  },
+  update: function() {
+    if (this.viz != null) {
+      this.viz.attr("d", buildCurve(this.v1, this.v2));
+    }
+  }
+};
+
+var v1 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
+var v2 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
+var v3 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
+var v4 = Vertex.create(Vector.create(600 * Math.random(), 600 * Math.random()), Math.random(), figure);
+
 VertexTable.push(v1);
 VertexTable.push(v2);
 VertexTable.push(v3);
+VertexTable.push(v4);
 
-var b1 = Bond.create(v1, v2, 0.5, figure);
-var b2 = Bond.create(v2, v3, 1, figure);
-var b3 = Bond.create(v1, v3, 1, figure);
+var b1 = Bond.create(v1, v2, Math.random(), figure);
+var b2 = Bond.create(v2, v3, Math.random(), figure);
+var b3 = Bond.create(v1, v3, Math.random(), figure);
+var b4 = Bond.create(v3, v1, Math.random(), figure);
+var b5 = Bond.create(v1, v4, Math.random(), figure);
+var b6 = Bond.create(v4, v1, Math.random(), figure);
 
 BondTable = [];
 BondTable.push(b1);
 BondTable.push(b2);
 BondTable.push(b3);
+BondTable.push(b4);
+BondTable.push(b5);
+BondTable.push(b6);
 
 function update() {
   var i;
